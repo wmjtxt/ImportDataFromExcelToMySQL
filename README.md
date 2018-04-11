@@ -1,7 +1,6 @@
-Java
-====
 
-## 用Java从Excel导数据到Mysql
+
+## 1 用Java从Excel导数据到Mysql
 
 * 步骤
     * 在Mysql数据库中先建好table
