@@ -66,7 +66,7 @@ public class ImportDataFromExcelToMysql {
 		
 		// 标题总列数
 		int colNum = row.getPhysicalNumberOfCells();
-		System.out.println(colNum);
+		//System.out.println("colNum="+colNum);
 		String[] title = new String[colNum];
 		for (int i = 0; i < colNum; i++) {
 			//title[i] = getStringCellValue(row.getCell((short) i));
@@ -165,27 +165,48 @@ public class ImportDataFromExcelToMysql {
 	}
 
 	public static void main(String[] args) {
+		//声明connection对象
+	    Connection conn;
+	    //驱动程序名
+		String driver = "com.mysql.jdbc.Driver";
+		//url指向要访问的数据库
+		//String url = "jdbc:mysql://localhost:3306/wmj?&useSSL=false";  //设置url，wmj是database
+		String url = "jdbc:mysql://localhost:3306/?&useSSL=false"; //useSSL=false
+		//用户名和密码
+		String user = "root";
+		String passwd = "root123";
+		String db = "case2";
+		String tbl = "tbl_data";
+		String path = "E:\\test";
 		try {			
-			//connection
-		    Class.forName("com.mysql.jdbc.Driver");
-		    String url = "jdbc:mysql://localhost:3306/wmj?&useSSL=false";  //设置url，wmj是database
-		    Connection conn;//创建连接
-		    conn = (Connection)DriverManager.getConnection(url, "root", "root123");//username="root",password = "root123"
+			//加载驱动程序
+		    Class.forName(driver);
+		    //连接数据库
+		    conn = (Connection)DriverManager.getConnection(url, user, passwd);
 		    Statement stmt = conn.createStatement();
-			
-			filepathlist = Util.fileList("D:\\lzu\\数据预处理\\Data", ".xls,.xlsx");//导入数据文件夹和数据文件类型
-			
-			
+			//获取文件路径
+			filepathlist = Util.fileList(path, ".xls,.xlsx");
 			
 			for(String filepath : filepathlist) {
-				//插入数据前
+				System.out.println("filepath="+filepath);
+				if(filepath == null)
+					break;
+				//title
 				String t = "";
-				String sql = "select count(*) from tbl_data_bak";
-				ResultSet ret = stmt.executeQuery(sql);
+				//sql语句
+				String sql = "";
+				//存储结果
+				ResultSet ret;
+				
+				//插入数据前
+				sql = "select count(*) from " + db + "." + tbl;
+				ret = stmt.executeQuery(sql);
 				if(ret.next()) {
-					System.out.print("count="+ret.getInt(1));
+					System.out.println("count1="+ret.getInt(1));
 				}
 				
+				
+				//读取Excel数据
 				ImportDataFromExcelToMysql excelReader = new ImportDataFromExcelToMysql(filepath);
 				// 对读取Excel表格标题测试
 				String[] title = excelReader.readExcelTitle();
@@ -199,15 +220,8 @@ public class ImportDataFromExcelToMysql {
 				
 				// 如果标题是数据，则插入
 				if(titleflag) {
-					sql = "insert into tbl_data_bak values(" + t + ");";
+					sql = "insert into " + db + "." + tbl + " values(" + t + ");";
 					stmt.executeUpdate(sql);
-				}
-				
-				// 插入数据后
-				sql = "select count(*) from tbl_data_bak";
-				ret = stmt.executeQuery(sql);
-				if(ret.next()) {
-					System.out.print("count="+ret.getInt(1));
 				}
 				
 				// 对读取Excel表格内容测试
@@ -217,14 +231,14 @@ public class ImportDataFromExcelToMysql {
 					//System.out.println(map.get(i));
 					sql = map.get(i).values().toString().substring(1,map.get(i).values().toString().length()-1);
 					//System.out.println("sql=" + sql);
-					stmt.executeUpdate("insert into tbl_data_bak values("+sql+");");
+					stmt.executeUpdate("insert into " + db + "." + tbl + " values("+sql+");");
 				}
 				
 				// 插入数据后
-				sql = "select count(*) from tbl_data_bak";
+				sql = "select count(*) from " + db + "." + tbl;
 				ret = stmt.executeQuery(sql);
 				if(ret.next()) {
-					System.out.print("count="+ret.getInt(1));
+					System.out.println("count2="+ret.getInt(1));
 				}
 			}
 			stmt.close();
