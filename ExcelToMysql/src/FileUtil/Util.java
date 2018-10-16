@@ -33,7 +33,7 @@ public class Util {
 		} else if (file.isDirectory()) {
 			String[] filelist = file.list();
 			for (int i = 0; i < filelist.length; i++) {
-				File readfile = new File(filepath + "\\" + filelist[i]);
+				File readfile = new File(filepath + "/" + filelist[i]);
 				if (!readfile.isDirectory()) {
 					if (matchType(readfile, fileTypes)) {
 						//System.out.println("absolutepath=" + readfile.getAbsolutePath());

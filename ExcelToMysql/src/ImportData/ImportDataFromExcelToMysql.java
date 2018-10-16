@@ -169,81 +169,88 @@ public class ImportDataFromExcelToMysql {
 	    Connection conn;
 	    //驱动程序名
 		String driver = "com.mysql.jdbc.Driver";
+		String db = "case3";
 		//url指向要访问的数据库
 		//String url = "jdbc:mysql://localhost:3306/wmj?&useSSL=false";  //设置url，wmj是database
-		String url = "jdbc:mysql://localhost:3306/?&useSSL=false"; //useSSL=false
+		String url = "jdbc:mysql://localhost:3306/"+db+"?&useSSL=false"; //useSSL=false
 		//用户名和密码
 		String user = "root";
 		String passwd = "root123";
-		String db = "case2";
+		//数据表
 		String tbl = "tbl_data";
-		String path = "E:\\test";
+		//数据存放路径
+		String path = "E:/dataProcess/Data/";
+		long startTime, endTime;
+		long startTime1, endTime1;
 		try {			
 			//加载驱动程序
 		    Class.forName(driver);
 		    //连接数据库
 		    conn = (Connection)DriverManager.getConnection(url, user, passwd);
-		    Statement stmt = conn.createStatement();
+		    //Statement stmt = conn.createStatement();
+		    conn.setAutoCommit(false);
+		    PreparedStatement pst = conn.prepareStatement("");
 			//获取文件路径
 			filepathlist = Util.fileList(path, ".xls,.xlsx");
-			
+
+			startTime = System.currentTimeMillis();
+			int cnt = 0;
 			for(String filepath : filepathlist) {
-				System.out.println("filepath="+filepath);
+				startTime1 = System.currentTimeMillis();
+				//System.out.println("filepath="+filepath);
 				if(filepath == null)
 					break;
+				cnt++;
 				//title
-				String t = "";
+				//需要作为左值的，设为StringBuffer，仅作为右值的，设为String即可
+				StringBuffer tbuf = new StringBuffer();
 				//sql语句
-				String sql = "";
-				//存储结果
-				ResultSet ret;
-				
-				//插入数据前
-				sql = "select count(*) from " + db + "." + tbl;
-				ret = stmt.executeQuery(sql);
-				if(ret.next()) {
-					System.out.println("count1="+ret.getInt(1));
-				}
-				
+				String prefix = "insert into " + tbl + " values(";//sql前缀
+				StringBuffer suffix = new StringBuffer();//sql后缀
 				
 				//读取Excel数据
 				ImportDataFromExcelToMysql excelReader = new ImportDataFromExcelToMysql(filepath);
 				// 对读取Excel表格标题测试
-				String[] title = excelReader.readExcelTitle();
+				String[] titles = excelReader.readExcelTitle();
 				//System.out.println("获得Excel表格的标题:");
-				for (String s : title) {
+				for (String s : titles) {
 					//System.out.print(s + "| ");
-					t += s + ",";
+					tbuf.append(s + ",");
 				}
-				t = t.substring(0,t.length()-1);
+				String title = tbuf.substring(0,tbuf.length()-1);
 				//System.out.println("title = " + t);
 				
 				// 如果标题是数据，则插入
 				if(titleflag) {
-					sql = "insert into " + db + "." + tbl + " values(" + t + ");";
-					stmt.executeUpdate(sql);
+					//stmt.executeUpdate(prefix + suffix.append(title + ");"));
+					pst.addBatch(prefix+suffix.append(title + ");"));
 				}
 				
 				// 对读取Excel表格内容测试
 				Map<Integer, Map<Integer, Object>> map = excelReader.readExcelContent();
 				//System.out.println("获得Excel表格的内容:");
 				for (int i = 1; i <= map.size(); i++) {
+					suffix.delete(0, suffix.length());//清空sql后缀
 					//System.out.println(map.get(i));
-					sql = map.get(i).values().toString().substring(1,map.get(i).values().toString().length()-1);
+					suffix.append(map.get(i).values().toString().substring(1,map.get(i).values().toString().length()-1)+");");
 					//System.out.println("sql=" + sql);
-					stmt.executeUpdate("insert into " + db + "." + tbl + " values("+sql+");");
+					//stmt.executeUpdate(prefix+suffix);
+					pst.addBatch(prefix+suffix);
+					
 				}
-				
-				// 插入数据后
-				sql = "select count(*) from " + db + "." + tbl;
-				ret = stmt.executeQuery(sql);
-				if(ret.next()) {
-					System.out.println("count2="+ret.getInt(1));
-				}
+				pst.executeBatch();
+				conn.commit();
+				endTime1 = System.currentTimeMillis();
+				System.out.println("插入文件成功！文件名：" + filepath);
+				System.out.println("\n运行时间：" + (endTime1 - startTime1) + "ms");
 			}
-			stmt.close();
+			endTime = System.currentTimeMillis();
+			System.out.println("导入数据成功！\n共导入" + cnt + "个文件");
+			System.out.println("总运行时间：" + (endTime - startTime) + "ms");
+
+			pst.close();
 		    conn.close();
-		    }
+		}
 		/*catch(SQLException e) {
 			e.printStackTrace();
 		}*/

@@ -12,14 +12,14 @@ public class CreateTable {
 	    Connection conn;
 	    //驱动程序名
 		String driver = "com.mysql.jdbc.Driver";
+		//数据库名
+		String db = "case4";
 		//url指向要访问的数据库
 		//String url = "jdbc:mysql://localhost:3306/wmj?&useSSL=false";  //设置url，wmj是database
 		String url = "jdbc:mysql://localhost:3306/?&useSSL=false";
 		//用户名和密码
 		String user = "root";
 		String passwd = "root123";
-		//数据库名
-		String db = "case2";
 		//表名
 		String tbl_config = "tbl_config";
 		String tbl_data = "tbl_data";
@@ -104,7 +104,7 @@ public class CreateTable {
 					"  `UserAttachedNumber` varchar(20) DEFAULT NULL,\r\n" + 
 					"  `OppositePhoneNumberArea` varchar(20) DEFAULT NULL,\r\n" + 
 					"  `OppositeCID` varchar(10) DEFAULT NULL\r\n" + 
-					") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+					") ENGINE=MyISAM DEFAULT CHARSET=utf8";
 			stmt.executeUpdate(sql);
 		
 			stmt.close();
