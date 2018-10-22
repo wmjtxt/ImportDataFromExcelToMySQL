@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import FileUtil.Util;
 
-import com.mysql.jdbc.Connection;
+//import com.mysql.jdbc.Connection;
 import java.sql.*;
 
 public class ImportDataFromExcelToMysql {
@@ -165,39 +165,33 @@ public class ImportDataFromExcelToMysql {
 	}
 
 	public static void main(String[] args) {
-		//声明connection对象
-	    Connection conn;
-	    //驱动程序名
-		String driver = "com.mysql.jdbc.Driver";
-		String db = "case3";
-		//url指向要访问的数据库
-		//String url = "jdbc:mysql://localhost:3306/wmj?&useSSL=false";  //设置url，wmj是database
-		String url = "jdbc:mysql://localhost:3306/"+db+"?&useSSL=false"; //useSSL=false
-		//用户名和密码
-		String user = "root";
-		String passwd = "root123";
-		//数据表
-		String tbl = "tbl_data";
+		ConnectMySQL connSql = new ConnectMySQL();
+		InitSQL isql = new InitSQL();
 		//数据存放路径
-		String path = "E:/dataProcess/Data/";
+		String path = "/home/wmj/dataProcess/Data/";
+		String db = "groups";//数据库名
+		String groupInfo = "1";
 		long startTime, endTime;
 		long startTime1, endTime1;
-		try {			
-			//加载驱动程序
-		    Class.forName(driver);
-		    //连接数据库
-		    conn = (Connection)DriverManager.getConnection(url, user, passwd);
+		try {
 		    //Statement stmt = conn.createStatement();
-		    conn.setAutoCommit(false);
-		    PreparedStatement pst = conn.prepareStatement("");
-			//获取文件路径
+			connSql.connectMySQL("");//开始连接时不指定数据库
+		    System.out.println("连接数据库成功!");
+		    
+			//文件路径
 			filepathlist = Util.fileList(path, ".xls,.xlsx");
-
+			int cnt = 0;//统计文件个数
+			//初始化数据库
+			isql.initSQL(connSql,db);
+			connSql.connectMySQL(db);//重新指定数据库连接
+			
+			PreparedStatement pst = connSql.conn.prepareStatement("");
+			//设置事务不自动提交
+			connSql.conn.setAutoCommit(false);
 			startTime = System.currentTimeMillis();
-			int cnt = 0;
 			for(String filepath : filepathlist) {
 				startTime1 = System.currentTimeMillis();
-				//System.out.println("filepath="+filepath);
+				System.out.println("filepath="+filepath);
 				if(filepath == null)
 					break;
 				cnt++;
@@ -205,7 +199,7 @@ public class ImportDataFromExcelToMysql {
 				//需要作为左值的，设为StringBuffer，仅作为右值的，设为String即可
 				StringBuffer tbuf = new StringBuffer();
 				//sql语句
-				String prefix = "insert into " + tbl + " values(";//sql前缀
+				String prefix = "insert into tbl_data values(";//sql前缀
 				StringBuffer suffix = new StringBuffer();//sql后缀
 				
 				//读取Excel数据
@@ -223,7 +217,7 @@ public class ImportDataFromExcelToMysql {
 				// 如果标题是数据，则插入
 				if(titleflag) {
 					//stmt.executeUpdate(prefix + suffix.append(title + ");"));
-					pst.addBatch(prefix+suffix.append(title + ");"));
+					pst.addBatch(prefix+suffix.append(title + ","+groupInfo+");"));
 				}
 				
 				// 对读取Excel表格内容测试
@@ -232,14 +226,14 @@ public class ImportDataFromExcelToMysql {
 				for (int i = 1; i <= map.size(); i++) {
 					suffix.delete(0, suffix.length());//清空sql后缀
 					//System.out.println(map.get(i));
-					suffix.append(map.get(i).values().toString().substring(1,map.get(i).values().toString().length()-1)+");");
+					suffix.append(map.get(i).values().toString().substring(1,map.get(i).values().toString().length()-1)+","+groupInfo+");");
 					//System.out.println("sql=" + sql);
 					//stmt.executeUpdate(prefix+suffix);
 					pst.addBatch(prefix+suffix);
 					
 				}
 				pst.executeBatch();
-				conn.commit();
+				connSql.conn.commit();
 				endTime1 = System.currentTimeMillis();
 				System.out.println("插入文件成功！文件名：" + filepath);
 				System.out.println("\n运行时间：" + (endTime1 - startTime1) + "ms");
@@ -249,7 +243,7 @@ public class ImportDataFromExcelToMysql {
 			System.out.println("总运行时间：" + (endTime - startTime) + "ms");
 
 			pst.close();
-		    conn.close();
+		    connSql.conn.close();
 		}
 		/*catch(SQLException e) {
 			e.printStackTrace();

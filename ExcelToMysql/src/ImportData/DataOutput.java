@@ -44,7 +44,7 @@ public class DataOutput {
 			
 			//创建文件   
 			startTime = System.currentTimeMillis();
-			String path = "E:\\dataProcess\\result";
+			String path = "/home/wmj/dataProcess/result/";
 			String filename = "graph";
 			
 			startTime = System.currentTimeMillis();

@@ -16,17 +16,12 @@ public class ConnectMySQL {
 		String url = "jdbc:mysql://localhost:3306/"+db+"?&useSSL=false";
 		//用户名和密码
 		String user = "root";
-		String passwd = "root123";
-		//long startTime, endTime;
+		String passwd = "123";
 		try {
-			//startTime = System.currentTimeMillis();
 			//加载驱动程序
 		    Class.forName(driver);
 		    //连接数据库
 		    conn = (Connection)DriverManager.getConnection(url, user, passwd);
-		    
-			//endTime = System.currentTimeMillis();
-			//System.out.println("连接数据库成功!\n连接数据库运行时间：" + (endTime - startTime) + "ms");
 		}
 		catch(Exception e)
 		{

@@ -2,7 +2,7 @@ package ImportData;
 
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.sql.ResultSet;
+//import java.sql.ResultSet;
 
 import com.mysql.jdbc.Connection;
 
@@ -19,14 +19,16 @@ public class DataProcess {
 		String url = "jdbc:mysql://localhost:3306/"+db+"?&useSSL=false";
 		//用户名和密码
 		String user = "root";
-		String passwd = "root123";
+		String passwd = "123";
+		long startTime, endTime;
+		startTime = System.currentTimeMillis();
 		try {			
 			//加载驱动程序
 		    Class.forName(driver);
 		    //连接数据库
 		    conn = (Connection)DriverManager.getConnection(url, user, passwd);
 		    Statement stmt = conn.createStatement();
-		    ResultSet ret;
+		    //ResultSet ret;
 			String sql = "";
 			
 			//#############数据处理#############################
@@ -103,7 +105,7 @@ public class DataProcess {
 			stmt.executeUpdate(sql);
 
 			//#4.以下查询结果作为图的edges
-			sql = "SELECT DISTINCT\r\n" + 
+			/*sql = "SELECT DISTINCT\r\n" + 
 					"    (SELECT \r\n" + 
 					"            UserID\r\n" + 
 					"        FROM\r\n" + 
@@ -124,7 +126,7 @@ public class DataProcess {
 				int UserID = ret.getInt(1);// 获取第一列的值UserID
 				int OppositeID = ret.getInt(2);// 获取第二列的值OppositeID
 				System.out.println(UserID + "," + OppositeID);
-			}
+			}*/
 			//#########################################################
 			
 			
@@ -135,5 +137,7 @@ public class DataProcess {
 		{
 			e.printStackTrace();
 		}
+		endTime = System.currentTimeMillis();
+		System.out.println("创建tbl_user成功!\n运行时间：" + (endTime - startTime) + "ms");
 	}
 }
