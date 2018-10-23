@@ -182,7 +182,7 @@ public class ImportDataFromExcelToMysql {
 			filepathlist = Util.fileList(path, ".xls,.xlsx");
 			int cnt = 0;//统计文件个数
 			//初始化数据库
-			isql.initSQL(connSql,db);
+			isql.initSQL(connSql,db,groupInfo);
 			connSql.connectMySQL(db);//重新指定数据库连接
 			
 			PreparedStatement pst = connSql.conn.prepareStatement("");
@@ -241,6 +241,9 @@ public class ImportDataFromExcelToMysql {
 			endTime = System.currentTimeMillis();
 			System.out.println("导入数据成功！\n共导入" + cnt + "个文件");
 			System.out.println("总运行时间：" + (endTime - startTime) + "ms");
+			
+			DataProcess dp = new DataProcess();
+			dp.dataProcess(connSql,groupInfo);
 
 			pst.close();
 		    connSql.conn.close();

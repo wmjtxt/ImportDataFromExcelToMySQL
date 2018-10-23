@@ -16,7 +16,7 @@ public class Main {
 		//test InitSQL
 		/*ConnectMySQL connSql = new ConnectMySQL();
 		//Connection conn;
-		try {
+		/*try {
 			startTime = System.currentTimeMillis();
 			connSql.connectMySQL("");
 			endTime = System.currentTimeMillis();
@@ -35,6 +35,11 @@ public class Main {
 		//outputFile test
 		//DataOutput dataOp = new DataOutput();
 		//dataOp.outputFile();
+		String groupinfo = "1";
+		ConnectMySQL connSql = new ConnectMySQL();
+		connSql.connectMySQL("groups");
+		DataProcess dp = new DataProcess();
+		dp.dataProcess(connSql,groupinfo);
 		System.out.println("helloworld");
 	}
 }

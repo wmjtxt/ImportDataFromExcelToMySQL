@@ -3,7 +3,7 @@ package ImportData;
 import java.sql.PreparedStatement;
 
 public class InitSQL {
-	public void initSQL(ConnectMySQL connSql,String db) {
+	public void initSQL(ConnectMySQL connSql,String db,String groupinfo) {
 		//初始化数据库，建立信息表、原始数据表
 		StringBuffer sql = new StringBuffer();
 		try {
@@ -20,11 +20,11 @@ public class InitSQL {
 			sql.delete(0, sql.length());*/
 			
 			//创建tbl_user;
-			sql.append("CREATE TABLE if not exists "+db+".tbl_user (" + 
+			sql.append("CREATE TABLE if not exists "+db+".tbl_user_" + groupinfo + "(" + 
 					"    UserID INT NOT NULL AUTO_INCREMENT," + 
-					"    PhoneNum VARCHAR(20)," + 
-					"    PhoneAreaCode VARCHAR(10)," + 
-					"    PhoneArea VARCHAR(20)," + 
+					"    PhoneNum VARCHAR(20) NOT NULL," + 
+					"    PhoneAreaCode VARCHAR(10) DEFAULT NULL," + 
+					"    PhoneArea VARCHAR(20) DEFAULT NULL," + 
 					"    NumberSource VARCHAR(20)," + 
 					"    Sign VARCHAR(1)," + 
 					"    IMSI VARCHAR(20)," + 
@@ -37,9 +37,9 @@ public class InitSQL {
 			sql.delete(0, sql.length());
 			
 			//创建tbl_call;
-			sql.append("CREATE TABLE if not exists " + db + ".tbl_call("+
+			sql.append("CREATE TABLE if not exists " + db + ".tbl_call_"+ groupinfo +"("+
 					"CallID INT NOT NULL AUTO_INCREMENT,"+
-					"PhoneNum VARCHAR(20),"+
+					"PhoneNum VARCHAR(20) NOT NULL,"+
 					"OppositePhoneNum varchar(20),"+
 					"CallDate date,"+
 					"CallTime time,"+
@@ -64,7 +64,7 @@ public class InitSQL {
 					"  `CallDate` date NOT NULL,\r\n" + 
 					"  `CallTime` time NOT NULL,\r\n" + 
 					"  `TalkTime` int(5) NOT NULL,\r\n" + 
-					"  `PhoneAreaCode` varchar(4) DEFAULT NULL,\r\n" + 
+					"  `PhoneAreaCode` varchar(10) DEFAULT NULL,\r\n" + 
 					"  `PhoneArea` varchar(20) DEFAULT NULL,\r\n" + 
 					"  `PhoneNumber` varchar(20) NOT NULL,\r\n" + 
 					"  `OppositePhoneAreacode` varchar(10) DEFAULT NULL,\r\n" + 
