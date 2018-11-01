@@ -343,7 +343,7 @@ select * from tbl_data a, tbl_data b where a.CallDate = b.CallDate and a.CallTim
 
 use datapro;
 select * from tbl_data
-here length(OppositePhoneNumber) > 1
+where length(OppositePhoneNumber) > 1
 group by PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime having count(*) > 1;
 
 select PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime from tbl_data
