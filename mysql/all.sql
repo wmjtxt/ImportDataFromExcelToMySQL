@@ -341,12 +341,19 @@ where CallDate = CallDate and CallTime = CallTime and OppositePhoneNumber not li
 
 select * from tbl_data a, tbl_data b where a.CallDate = b.CallDate and a.CallTime = b.CallTime and a.TalkTime = b.TalkTime and length(a.OppositePhoneNumber) > 1 and a.CallID <> b.CallID;
 
-use datapro;
+use test1;
 select * from tbl_data
-where length(OppositePhoneNumber) > 1
+#where length(OppositePhoneNumber) > 1
 group by PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime having count(*) > 1;
 
 select PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime from tbl_data
-where length(OppositePhoneNumber) > 1
+#where length(OppositePhoneNumber) > 1
 group by PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime having count(*) > 1;
+
+
+select count(*) from tbl_call_1;
+
+select PhoneNum,OppositePhoneNum,CallDate,CallTime,TalkTime from tbl_call_1
+#where length(OppositePhoneNumber) > 1
+group by PhoneNum,OppositePhoneNum,CallDate,CallTime,TalkTime having count(*) > 1;
 
