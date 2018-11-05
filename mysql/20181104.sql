@@ -14,11 +14,14 @@ select count(*) from tbl_data;
 select count(*) from tbl_call_1;
 #75407
 # 需要单独存储的数据
-# 1. 10开头，如10086,10010,10000,1065/1069       8165/9389 /前为上步骤去重后个数
+# 1. 10开头，如10086,10010,10000,1065/1069       8165/9389 /前为上步骤去重后个数,下同
 # 2. 11开头，如110,119,118,114                    205/216
 # 3. 12开头，如120,12306                          113/118
 # 4. 400开头                                       60/73
-# total : 8543/9796
+# 5. 95开头                                       284/358
+# 6. 93100开头                                   5335/5335
+
+# total : 8827/10154
 select count(*) from tbl_call where OppositePhoneNum like '10%' or OppositePhoneNum like '11%' or OppositePhoneNum like '12%' or OppositePhoneNum like '400%';
 
 # 建立数据表tbl_serv_no
@@ -31,4 +34,4 @@ select count(*) from tbl_call where OppositePhoneNum like '10%' or OppositePhone
 
 delete from tbl_call where OppositePhoneNum like '10%' or OppositePhoneNum like '11%' or OppositePhoneNum like '12%' or OppositePhoneNum like '400%';
 
-#至此，有效数据共66864条
+#至此，有效数据共66580条
