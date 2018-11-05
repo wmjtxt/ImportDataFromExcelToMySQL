@@ -19,7 +19,7 @@ select count(*) from tbl_call_1;
 # 3. 12开头，如120,12306                          113/118
 # 4. 400开头                                       60/73
 # 5. 95开头                                       284/358
-# 6. 93100开头                                   5335/5335
+# 6. 93100开头                                   5335/5335  //暂不处理
 
 # total : 8827/10154
 select count(*) from tbl_call where OppositePhoneNum like '10%' or OppositePhoneNum like '11%' or OppositePhoneNum like '12%' or OppositePhoneNum like '400%';
