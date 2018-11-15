@@ -29,6 +29,7 @@
 	* 今天继续做了根据筛选条件提取数据，这部分也不难。在DataFetch.java里。跟DataExport一样，返回String[]就行了。
 	至于细节方面，比如要查询哪些数据，根据哪些筛选条件，可以再做修改。框架有了就好做了。
 	那么，好像工作完成的差不多了，明天正好汇报，看接下来还需要做什么。
+
 * ***2018.11.13***<br>
 	**前几天做的忘了总结，今天补上**
 	* 1.标志KeyUsers。在tbl_user表中设置人员标志属性Signs，重点用户为0x100，其他用户为0x200，插入数据时即赋值。
@@ -48,3 +49,35 @@
 	* 发现有几条数据，对方号码是手机号前面加上00，00180××××0000这样的，然后搜索180××××0000这个手机号，
 	有几百条数据的对方号码是这个号码，不知道这代表什么意思，是这号码偶尔在国外通话？还好这部分数据量不算大。
 	* DataFetch条件，添加connTypes,persTypes,isServNo,isIntlNo。只有persTypes需要联表查询。
+
+* ***2018.11.14***<br>
+	* 整理了下之前的代码。现在有用的类有ConnectMySQL.java, InitSQL.java, Procedures.java, DataImport.java.
+	* tbl_user，按KeySigns分类，0x000,0x100,0x200,0x300,分别表示
+		* 0x000, 普通用户，仅在对方号码里出现过
+		* 0x100, 重点用户
+		* 0x200, 在对方号码里出现过的重点用户
+		* 0x300, 对方号码里与至少两个重点用户联系过的（这个怎么查询？）
+	* 0x300,搞定了，写在conn2keyuser.sql里，也加到procedure里了。真的麻烦啊这个，需要查询整个tbl_data表，挺耗时间的，
+	* 0x100,0x200和0x300有重复,怎么处理？
+	
+* ***20181115***
+	* 昨天晚上发现，我对一些含义理解有误。再整理一下。
+|词语|含义|备注|
+|:--:|----|----|
+|跟踪对象|指原始数据中左侧号码|0x100|
+|至少联系两名跟踪对象者|右侧号码中与至少两名左侧号码联系过|0x300|
+|0x000|右侧用户初始值|KeySigns|
+|0x100|即跟踪对象，左侧用户初始值|KeySigns|
+|0x200|右侧号码中在左侧也出现过的，即左侧号码集和右侧号码集的交集(应该没理解错吧)|KeySigns|
+|0x300|至少联系两名跟踪对象者|KeySigns|
+不过,0x200,0x300有重叠
+	* 考虑在tbl_call表中添加属性PhoneNumberSigns,OppositePhoneNumberSigns,
+  可以简化写成LeftNumSigns,RightNumSigns,即左侧号码标志，右侧号码标志
+	* 初始时，左侧0x100,右侧0x000
+	* 导完数据后,即提取users到tbl_user表中，在此过程中，可以查找右侧号码在左侧
+    出现过的，RightNumSigns改为0x200;也可以查找右侧号码中至少联系两名左侧号码的，
+    RightNumSigns = 0x300，注意，查找时要排除RightNumSigns = 0x200的号码。
+	* ***不得已，又要改动表结构啦***，一改动表结构，就要改InitSQL.java(create table语句),Procedures.java(insert和update语句),DataImport.java(insert),DataFetch.java(select)等等
+	* 又发现，好像LeftNumSigns没有用，保持对称吧，说不定以后有用
+	* 改好在win10上运行，执行存储过程时间太久了，Ctrl+c了，不知道哪出问题了，明天再说。
+
