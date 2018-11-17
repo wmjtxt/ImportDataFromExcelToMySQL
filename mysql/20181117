@@ -1,0 +1,26 @@
+use datapro;
+
+select count(*) from tbl_call; -- 75407
+
+select count(*) from tbl_call where RightNumSigns = '0x000'; -- 33243
+
+select count(*) from tbl_call where RightNumSigns = '0x200'; --  5264
+
+select count(*) from tbl_call where RightNumSigns = '0x300'; -- 36900
+
+select distinct OppositePhoneNumber from tbl_call where RightNumSigns = '0x200';
+
+select distinct OppositePhoneNumber from tbl_call where RightNumSigns = '0x300';
+
+select count(*) from tbl_user where KeySigns = '0x000';
+
+#右侧
+#跟踪对象40
+select count(*) from (
+select distinct OppositePhoneNumber from tbl_call where RightNumSigns = '0x200') as t; --  40
+#至少与两个跟踪对象联系者 573
+select count(*) from (
+select distinct OppositePhoneNumber from tbl_call where RightNumSigns = '0x300') as t; -- 573
+#普通用户 3716
+select count(*) from (
+select distinct OppositePhoneNumber from tbl_call where RightNumSigns = '0x000') as t; -- 3716
