@@ -85,4 +85,14 @@
 	* 执行0x300的update语句居然要一个多小时,不知道问题在哪。改了下，应该好了。
 	* 关于存储过程，还是不太会用。还有触发器，sql其实没那么简单，觉得简单只是因为你知道的少。
 * ***2018.11.17***
-	* 添加类Configs.java,统计用户数，终于用户数等信息。
+	* 添加类Configs.java,统计用户数，重要用户数等信息。
+* ***2018.11.20***
+	* 添加servnocnt,intlnocnt
+* ***2018.11.22***
+	* 去掉ServNoSigns,IntlNoSigns, RightNumSigns = 0x400代表服务号码,RightNumSigns = 0x500代表国际号码。
+	* users,用户表的添加、删除、选择全部、修改密码
+	* 导入数据时，选择文件路径，JFileChooser
+	* config,getConfig
+	* dataFetch:input,String[];output,String[]
+	* todo: 
+		* groupinfo,人群信息表的添加、删除、选择全部。
