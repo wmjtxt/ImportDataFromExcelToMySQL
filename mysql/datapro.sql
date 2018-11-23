@@ -1,7 +1,22 @@
 #创建数据库
 CREATE DATABASE if not exists datapro;
-#创建原始数据表tbl_data
-CREATE TABLE if not exists tbl_data(
+USE datapro;
+CREATE TABLE if not exists manage_users(
+	UserID   varchar(10),
+	UserName varchar(20),
+	Role     varchar(10),
+	PassWord varchar(32),
+	PRIMARY KEY(UserID)
+	);
+CREATE TABLE if not exists manage_groups(
+	GroupID   varchar(10),
+	GroupName varchar(20),
+	Remark    varchar(32),
+	PRIMARY KEY(GroupID)
+	);
+
+#创建原始数据表data_all
+CREATE TABLE if not exists data_all(
 	CallID varchar(5) NOT NULL,
 	CallRecordType varchar(20) DEFAULT NULL,
 	CallSource varchar(10) DEFAULT NULL,
@@ -62,8 +77,8 @@ CREATE TABLE if not exists tbl_data(
 	GroupInfo varchar(20) NOT NULL
 	);
 
-#创建tbl_user
-CREATE TABLE if not exists tbl_user(
+#创建data_tel
+CREATE TABLE if not exists data_tel(
 	UserID INT NOT NULL AUTO_INCREMENT,
 	PhoneNumber VARCHAR(20) NOT NULL,
 	PhoneAreaCode VARCHAR(10) DEFAULT NULL,
@@ -77,8 +92,8 @@ CREATE TABLE if not exists tbl_user(
 	PRIMARY KEY (UserID,PhoneNumber)
 	);
 
-#创建联系表tbl_call
-CREATE TABLE if not exists tbl_call(
+#创建联系表data_call
+CREATE TABLE if not exists data_call(
 	CallID INT NOT NULL AUTO_INCREMENT,
 	PhoneNumber VARCHAR(20) NOT NULL,
 	PhoneAreaCode varchar(10),
@@ -94,8 +109,6 @@ CREATE TABLE if not exists tbl_call(
 	CallSign varchar(10),
 	CGI varchar(50),
 	CGIChinese varchar(200),
-	ServNoSigns VARCHAR(20),
-	IntlNoSigns VARCHAR(20),
 	LeftNumSigns varchar(20),
 	RightNumSigns varchar(20),
 	GroupInfo varchar(20) NOT NULL,
@@ -107,71 +120,71 @@ DELIMITER //
 CREATE PROCEDURE proc_datapro()
 BEGIN 
 	SET SQL_SAFE_UPDATES = 0;
-	#提取数据到tbl_user
-	INSERT INTO tbl_user 
+	#提取数据到data_tel
+	INSERT INTO data_tel 
 		SELECT DISTINCT null,PhoneNumber,PhoneAreaCode,PhoneArea,CallSource,'0x100',IMSI,null,null,GroupInfo 
-		FROM tbl_data;
-	INSERT INTO tbl_user
+		FROM data_all;
+	INSERT INTO data_tel
 		SELECT DISTINCT null,OppositePhoneNumber,OppositePhoneAreaCode,OppositePhoneArea,null,'0x000',IMSI,null,null,GroupInfo
-		FROM tbl_data;
+		FROM data_all;
 	#0x200,右侧号码为跟踪对象的
-	UPDATE tbl_data SET RightNumSigns = '0x200' WHERE OppositePhoneNumber IN (
+	UPDATE data_all SET RightNumSigns = '0x200' WHERE OppositePhoneNumber IN (
 		SELECT OppositePhoneNumber FROM (
-			SELECT distinct OppositePhoneNumber FROM tbl_data WHERE OppositePhoneNumber IN (
-				SELECT distinct PhoneNumber FROM tbl_data 
+			SELECT distinct OppositePhoneNumber FROM data_all WHERE OppositePhoneNumber IN (
+				SELECT distinct PhoneNumber FROM data_all 
 			)
 		) AS t
 	);
 	#0x300,右侧号码与至少两个跟踪对象联系者
-	UPDATE tbl_data SET RightNumSigns = '0x300' WHERE OppositePhoneNumber IN (
+	UPDATE data_all SET RightNumSigns = '0x300' WHERE OppositePhoneNumber IN (
 		SELECT OppositePhoneNumber FROM(
 			SELECT OppositePhoneNumber FROM(
-				SELECT OppositePhoneNumber FROM tbl_data WHERE LENGTH(OppositePhoneNumber)>1 AND RightNumSigns <> '0x200'
+				SELECT OppositePhoneNumber FROM data_all WHERE LENGTH(OppositePhoneNumber)>1 AND RightNumSigns <> '0x200'
 				GROUP BY OppositePhoneNumber,PhoneNumber
 			) AS t1
 			GROUP BY OppositePhoneNumber HAVING COUNT(*) > 1
 		)as t2
 	);
-	#tbl_user去重
-	DELETE FROM tbl_user WHERE UserID IN (
+	#data_tel去重
+	DELETE FROM data_tel WHERE UserID IN (
 		SELECT UserID FROM(
-			SELECT  UserID FROM tbl_user WHERE PhoneNumber IN (
-				SELECT PhoneNumber FROM tbl_user 
+			SELECT  UserID FROM data_tel WHERE PhoneNumber IN (
+				SELECT PhoneNumber FROM data_tel 
 				GROUP BY PhoneNumber HAVING COUNT(PhoneNumber) > 1
 			) AND UserID NOT IN (
-				SELECT MIN(UserID) FROM tbl_user 
+				SELECT MIN(UserID) FROM data_tel 
 				GROUP BY PhoneNumber HAVING COUNT(PhoneNumber) > 1
 			)
 		) AS t
 	);
-	#提取数据到tbl_user
-	INSERT INTO tbl_call 
+	#提取数据到data_tel
+	INSERT INTO data_call 
 		SELECT null,PhoneNumber,PhoneAreaCode,PhoneArea,OppositePhoneNumber,OppositePhoneAreaCode,OppositePhoneArea,
-			CallRecordType,CallDate,CallTime,TalkTime,CallType,CallSign,CGI,CGIChinese,0,0,LeftNumSigns,RightNumSigns,GroupInfo 
-			FROM tbl_data;
-	#tbl_call去重
-	DELETE FROM tbl_call WHERE OppositePhoneNumber LIKE ' %';
-	DELETE FROM tbl_call WHERE CallID IN (
+			CallRecordType,CallDate,CallTime,TalkTime,CallType,CallSign,CGI,CGIChinese,LeftNumSigns,RightNumSigns,GroupInfo 
+			FROM data_all;
+	#data_call去重
+	DELETE FROM data_call WHERE OppositePhoneNumber LIKE ' %';
+	DELETE FROM data_call WHERE CallID IN (
 		SELECT CallID FROM (
-			SELECT CallID FROM tbl_call 
+			SELECT CallID FROM data_call 
 			WHERE (PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime) IN (
-				SELECT PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime FROM tbl_call 
+				SELECT PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime FROM data_call 
 				GROUP BY PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime 
 				HAVING COUNT(*) > 1
 			)
 			AND CallID NOT IN (
-				SELECT MIN(CallID) FROM tbl_call 
+				SELECT MIN(CallID) FROM data_call 
 				GROUP BY PhoneNumber,OppositePhoneNumber,CallDate,CallTime,TalkTime 
 				HAVING COUNT(*) > 1
 			)
 		) AS t
 	);
 	#ServNo
-	UPDATE tbl_call SET ServNoSigns = '1'
+	UPDATE data_call SET RightNumSigns = '0x400'
 		WHERE OppositePhoneNumber LIKE '10%' OR OppositePhoneNumber LIKE '11%' OR OppositePhoneNumber LIKE '12%'
 			OR OppositePhoneNumber LIKE '400%' OR OppositePhoneNumber LIKE '95%';\n
 	#IntlNo
-	UPDATE tbl_call SET IntlNoSigns = '1'
+	UPDATE data_call SET RightNumSigns = '0x500'
 	 	WHERE OppositePhoneNumber LIKE '00%';
 END 
 //
