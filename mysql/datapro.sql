@@ -182,7 +182,7 @@ BEGIN
 	#ServNo
 	UPDATE data_call SET RightNumSigns = '0x400'
 		WHERE OppositePhoneNumber LIKE '10%' OR OppositePhoneNumber LIKE '11%' OR OppositePhoneNumber LIKE '12%'
-			OR OppositePhoneNumber LIKE '400%' OR OppositePhoneNumber LIKE '95%';\n
+			OR OppositePhoneNumber LIKE '400%' OR OppositePhoneNumber LIKE '95%';
 	#IntlNo
 	UPDATE data_call SET RightNumSigns = '0x500'
 	 	WHERE OppositePhoneNumber LIKE '00%';
