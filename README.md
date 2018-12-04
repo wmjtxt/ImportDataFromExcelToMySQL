@@ -108,3 +108,7 @@
 		* 2.导入数据DataImport.java
 		* 3.能否适应多种数据库（尝试）
 	* 添加win批处理文件datapro.bat
+
+* ***2018.12.04***
+	* 今天在Oracle上测试一下，发现Oracle跟MySQL差别好大啊。坑。different.md
+	* Oracle的存储过程不会用啊！！！
