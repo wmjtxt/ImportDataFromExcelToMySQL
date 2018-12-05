@@ -118,3 +118,5 @@
 	* 完成了Oracle下的日期和时间整合，真是超麻烦。
 	* 完成DataFetchFromOracle，其实还是处理日期，查询的时候也得加to_date和格式'yyyy-mm-dd hh24:mi:ss'。真的是...
 	* 项目到此为止。
+	* ***Oracle导入数据时，用PreparedStatement，事务，出现内存溢出？Exception in thread "main" java.lang.OutOfMemoryError: Java heap space,不知道是怎么回事***
+	* Oracle你咋回事！？
