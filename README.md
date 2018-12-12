@@ -121,3 +121,7 @@
 	* ***Oracle导入数据时，用PreparedStatement，事务，出现内存溢出？Exception in thread "main" java.lang.OutOfMemoryError: Java heap space,不知道是怎么回事*** Oracle你咋回事！？
 	* 好像是导入到20万条数据的时候溢出的。tomcat不知道有用没，待会装了试一下。
 	* 原来是addBatch，executeBatch的问题。addBatch很快，executeBatch超级慢，然后最后都卡在内存了？？？这是什么机制，反正MySQL没这问题。
+
+* ***2018.12.12***
+	* 项目还要写文档。报酬有的。哈哈哈。
+	* 新系统已安装好,固态真快。
